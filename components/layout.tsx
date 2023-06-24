@@ -14,8 +14,8 @@ export default function Layout({ props, children }: any) {
         <div>
             <Head>
                 <title>Minting Site</title>
-                <meta name="description" content="0xCANTO" />
-                <link rel="icon" href="/0xCANTO.png" />
+                <meta name="description" content="hakuryo" />
+                <link rel="icon" href="/hakuryo_signature_final.png" />
             </Head>
 
             <Navbar />

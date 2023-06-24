@@ -14,19 +14,25 @@ import contractData from "../pages/api/contractData.json"
 
 const ContractProvider = ({ children }: any) => {
     
-    const contractAddress = contractConfig.contractAddress
-    const contractABI = contractConfig.contractABI
+    // const contractAddress = contractConfig.contractAddress
+    // const contractABI = contractConfig.contractABI
+    
+    const contracts = {};
+    for (const contractName in contractConfig) {
+        const contract = contractConfig[contractName];
+        
+        contracts[contractName] = contract;
+    }
     
     const { data: blockNumberData, isError: blockNumberIsError, isLoading: blockNumberIsLoading } = useBlockNumber({
         watch: true
     })
 
     const { address } = useAccount();
-
-            
-
+    
+    
     return(
-        <ContractContext.Provider value={{blockNumberData, address
+        <ContractContext.Provider value={{blockNumberData, address, contracts
             }}>
             {children}
         </ContractContext.Provider>
