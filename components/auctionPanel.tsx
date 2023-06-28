@@ -9,11 +9,11 @@ const AuctionInfo = () => {
         purchasePriceForOne, initialSupply} = useContext(ContractContext);
 
     return (
-        <div className="">
+        <div>
             <div className="font-bold text-xl"> Auction </div>
-            {totalSupply && <Infoblock info={"Total Supply"} contractInfo={Number(totalSupply)/10**18} />}
+            {totalSupply && <Infoblock info={"Total Supply"} contractInfo={Number(totalSupply)/10**18} />} 
             {purchasePriceForOne && <Infoblock info={"Price of 1 Zi"} contractInfo={Number(purchasePriceForOne)/10**18+" Ξ"} />}
-            {initialSupply && <Infoblock info={"initialSupply"} contractInfo={Number(initialSupply)/10**18+" Ξ"} />}
+            {initialSupply && <Infoblock info={"initialSupply"} contractInfo={Number(initialSupply)/10**18+" Ξ"} />} 
 
 
         </div>

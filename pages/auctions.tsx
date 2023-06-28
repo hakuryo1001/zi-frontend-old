@@ -1,7 +1,8 @@
 
-import AuctionInfo from '../../zi-frontend-fucked/components/auctionPanel';
-import LaunchpadPanel from "../../zi-frontend-fucked/components/launchpadPanel"
 
+
+import AuctionInfo from '../components/auctionPanel';
+import LaunchpadPanel from "../components/launchpadPanel";
 
 
 function Auctions() {
