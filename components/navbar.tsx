@@ -1,11 +1,12 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+
 import Link from 'next/link'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import links from '../links';
-
+import { Profile } from './profile';
 
 
 const styles = {
@@ -77,10 +78,12 @@ const Navbar = () => {
                 
                      <ul className="flex flex-cols place-items-center p-4 mt-4  rounded-lg border border-gray-100 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                         <NavElement href={"/zi_token"} name={"Zi Token 黹"} />
-                        <NavElement href={"/contractsPages"} name={"contracts"} />
+                        <NavElement href={"/contractsPage"} name={"contracts"} />
+                        <NavElement href={"/auctions"} name={"auctions"}/>
                         <NavElement  href={links.twitter} name="" icon={icons.twitter}/>
                         <NavElement  href={links.telegram} name="" icon={icons.telegram}/>
                         <ConnectButton />
+                        <Profile/>
                     </ul>
                 </div>
             </div>

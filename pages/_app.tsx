@@ -25,19 +25,18 @@ import { goerli } from '@wagmi/core/chains';
 // const supportedChains = ["canto"];
 
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
-import { mainnet } from 'wagmi/chains'
+import { localhost } from 'wagmi/chains'
 
 
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet],
+  [localhost],
   [alchemyProvider({ apiKey: 'yourAlchemyApiKey' }), publicProvider()],
 )
 
-const { connectors } = getDefaultWallets({
-  appName: 'My RainbowKit App',
-  chains
-});
+export const injectedConnector = new InjectedConnector({
+  chains: chains,
+})
 
 // Set up wagmi config
 const config = createConfig({
@@ -56,13 +55,14 @@ const config = createConfig({
         projectId: '...',
       },
     }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: 'Injected',
-        shimDisconnect: true,
-      },
-    }),
+    injectedConnector
+    // new InjectedConnector({
+    //   chains,
+    //   options: {
+    //     name: 'Injected',
+    //     shimDisconnect: true,
+    //   },
+    // }),
   ],
   publicClient,
   webSocketPublicClient,

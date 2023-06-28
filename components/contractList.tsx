@@ -3,15 +3,15 @@ import { ContractContext } from '../contexts';
 
 
 const ContractList = () => {
-    const { contracts } = useContext(ContractContext);
+    const { contractConfig } = useContext(ContractContext);
     
     return (
         <div>
             <h2>Contract List</h2>
             <ul>
-                {Object.keys(contracts).map((contractName) => (
+                {Object.keys(contractConfig).map((contractName) => (
                     <li key={contractName}>
-                        <strong>{contractName}</strong>: {contracts[contractName].contractAddress}
+                        <strong>{contractName}</strong>: {contractConfig[contractName].contractAddress}
                     </li>
                 ))}
             </ul>

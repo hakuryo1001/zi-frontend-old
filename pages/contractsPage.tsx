@@ -1,8 +1,10 @@
 import ContractList from "../components/contractList";
 
-const contractsPage: NextPage = () => {
+const ContractsPage: NextPage = () => {
     return (
         <main>
             <ContractList/>
         </main>)
 }
+
+export default ContractsPage
