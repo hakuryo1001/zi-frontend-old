@@ -1,5 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-
+import ConnectWallet from './connectWallet';
 import Link from 'next/link'
 import Image from 'next/image';
 import { useRouter } from 'next/router'
@@ -82,8 +82,8 @@ const Navbar = () => {
                         <NavElement href={"/auctions"} name={"auctions"}/>
                         <NavElement  href={links.twitter} name="" icon={icons.twitter}/>
                         <NavElement  href={links.telegram} name="" icon={icons.telegram}/>
-                        <ConnectButton />
-                        <Profile/>
+                        <ConnectWallet/>
+       
                     </ul>
                 </div>
             </div>

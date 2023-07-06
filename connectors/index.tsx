@@ -9,7 +9,9 @@ import { localhost } from 'wagmi/chains'
 
 export const { chains, publicClient, webSocketPublicClient } = configureChains(
   [localhost],
-  [alchemyProvider({ apiKey: 'yourAlchemyApiKey' }), publicProvider()],
+  [
+    // alchemyProvider({ apiKey: 'yourAlchemyApiKey' }),
+     publicProvider()],
 )
 
 export const injectedConnector = new InjectedConnector({
@@ -19,19 +21,7 @@ export const injectedConnector = new InjectedConnector({
 export const config = {
   autoConnect: true,
   connectors: [
-    new MetaMaskConnector({ chains }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: 'wagmi',
-      },
-    }),
-    // new WalletConnectConnector({
-    //   chains,
-    //   options: {
-    //     projectId: '...',
-    //   },
-    // }),
+   
     injectedConnector,
   ],
   publicClient,
