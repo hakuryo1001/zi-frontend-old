@@ -5,6 +5,11 @@ import type {
     TokenSymbol
   } from '@web3-onboard/common'
 
+  
+  
+
+
+
 interface Account {
     address: string,
     balance: Record<TokenSymbol, string> | null,
@@ -15,6 +20,7 @@ export default function ConnectWallet() {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [ethersProvider, setProvider] = useState<ethers.providers.Web3Provider | null>()
   const [account, setAccount] = useState<Account | null>(null)
+  
 
   useEffect(() => {
     if (wallet?.provider) {
@@ -24,6 +30,7 @@ export default function ConnectWallet() {
         balance: wallet.accounts[0].balance,
         ens: { name, avatar: avatar?.url }
       })
+      
     }
   }, [wallet])
 
@@ -35,15 +42,15 @@ export default function ConnectWallet() {
       // ethersProvider = new ethers.BrowserProvider(wallet.provider, 'any')
     }
   }, [wallet])
-
+  
   if(wallet?.provider && account) {
     return (
-        <div className="rounded-lg p-2.5 bg-white ">
+        <div className="rounded-lg p-2 bg-white ">
             {account.ens?.avatar ? (<img src={account.ens?.avatar} alt="ENS Avatar" />) : null}
           {/* <div>{ account.ens?.name ? account.ens.name : String(account.address).slice(0,10).concat("...") }</div> */}
           {/* <div>Connected to {wallet.label}</div> */}
-          <button onClick={() => { disconnect({ label: wallet.label }) }}>
-          { account.ens?.name ? account.ens.name : String(account.address).slice(0,10).concat("...") }
+          <button onClick={() => { disconnect({ label: wallet.label })}}>
+          { account.ens?.name ? account.ens.name : String(account.address).slice(0,10).concat("...") } 
             </button>
         </div>
     )

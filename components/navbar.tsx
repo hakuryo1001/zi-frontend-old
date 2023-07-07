@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import links from '../links';
-import { Profile } from './profile';
+import NetworkDisplay from './networkDisplay';
+
 
 
 const styles = {
@@ -27,21 +28,6 @@ const icons = {
 }
 
 
-
-
-// const NavElement = ({ href, name}: any) => {
-//     const router = useRouter();
-//     const active = router.asPath === href;
-//     if (active) return (
-//         <Link href={href}>
-//             <div className={styles.navElement} aria-current="page">{name}</div>
-//         </Link>
-//     ); else return (
-//         <Link href={href}>
-//             <div className={styles.navElement}>{name}</div>
-//         </Link>
-//     );
-// }
 
 const NavElement = ({ href, name, icon = null }: any) => {
     const router = useRouter();
@@ -83,6 +69,7 @@ const Navbar = () => {
                         <NavElement  href={links.twitter} name="" icon={icons.twitter}/>
                         <NavElement  href={links.telegram} name="" icon={icons.telegram}/>
                         <ConnectWallet/>
+                        <NetworkDisplay/>
        
                     </ul>
                 </div>

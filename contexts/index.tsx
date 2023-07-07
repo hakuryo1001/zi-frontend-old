@@ -4,12 +4,17 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { readContract, readContracts } from '@wagmi/core'
 import contractConfig from "../contractConfig/contractConfig";
 
+import { ethers } from 'ethers'
 
-import { useBlockNumber, useAccount } from 'wagmi';
+
 
 const ContractContext = createContext<any>({})
 
 const ContractProvider = ({ children }: any) => {
+
+    const [provider, setProvider] = useState(null);
+    const [signer, setSigner] = useState(null);
+
     const [initialSupply, setInitialSupply] = useState(null);
     const [supplyLimit, setSupplyLimit] = useState(null);
     const [minterAddresses, setMinterAddresses] = useState(null);
@@ -45,216 +50,126 @@ const ContractProvider = ({ children }: any) => {
     const auctionModule_address = contractConfig.AuctionModule.contractAddress;
     const auctionModule_abi = contractConfig.AuctionModule.contractABI;
 
+
     useEffect(() => {
+
+        if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
+            // We are in the browser and metamask is running
+            setProvider(new ethers.providers.Web3Provider(window.ethereum));
+        }
+
+    }, []);
+
+    useEffect(() => {
+        if (provider) {
+            setSigner(provider.getSigner());
+        }
+    }, [provider]);
+
+    useEffect(() => {
+        if (!signer) return;
+
+        const ziContract = new ethers.Contract(zi_address, zi_abi, signer);
+        const auctionModuleContract = new ethers.Contract(auctionModule_address, auctionModule_abi, signer);
+
         const fetchData = async () => {
-            const zi_data = await readContracts({
-                contracts: [
-                    { address: zi_address, abi: zi_abi, functionName: 'initialSupply' },
-                    { address: zi_address, abi: zi_abi, functionName: 'supplyLimit' },
-                    { address: zi_address, abi: zi_abi, functionName: 'minterAddresses', args: [0] },
-                    { address: zi_address, abi: zi_abi, functionName: 'minters', args: [address] },
-                    { address: zi_address, abi: zi_abi, functionName: 'minterAllowance', args: [address] },
-                    { address: zi_address, abi: zi_abi, functionName: 'initialAllowance', args: [address] },
-                    { address: zi_address, abi: zi_abi, functionName: 'enabledMinters', args: [address] },
-                    { address: zi_address, abi: zi_abi, functionName: 'isMinter', args: [address] },
-                    { address: zi_address, abi: zi_abi, functionName: 'remainingSupply' },
-                    { address: zi_address, abi: zi_abi, functionName: 'oneBipOfTotalSupply' },
-                    { address: zi_address, abi: zi_abi, functionName: 'allMinters' },
-                    { address: zi_address, abi: zi_abi, functionName: 'totalSupply' },
-                    { address: zi_address, abi: zi_abi, functionName: 'purchasePrice', args:[Number(1000000000000000000)] },
-                ],
-            });
-            const auctionModule_data = await readContracts({
-                contracts: [
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'token' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'tokenAddress' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'totalAuctionAmount' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'totalAmountSold' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'limit' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'initialAuctionPrice' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'lastAvailableAuctionStartTime' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'startTime' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'timeToEmitAll' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'halflife' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'decayConstant' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'emissionRate' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'criticalTime' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'criticalAmount' },
-                    { address: auctionModule_address, abi: auctionModule_abi, functionName: 'purchasePrice', args:[Number(1000000000000000000)] },
-                ],
-            });
+            const ziInitialSupply = await ziContract.initialSupply();
+            const ziSupplyLimit = await ziContract.supplyLimit();
+            // const ziMinterAddresses = await ziContract.minterAddresses();
+            // const ziMinters = await ziContract.minters();
+            // const ziMinterAllowance = await ziContract.minterAllowance();
+            // const ziInitialAllowance = await ziContract.initialAllowance();
+            // const ziEnabledMinters = await ziContract.enabledMinters();
+            // const ziIsMinter = await ziContract.isMinter();
+            const ziRemainingSupply = await ziContract.remainingSupply();
+            const ziOneBipOfTotalSupply = await ziContract.oneBipOfTotalSupply();
+            const ziAllMinters = await ziContract.allMinters();
+            const ziTotalSupply = await ziContract.totalSupply();
+            // const ziPurchasePrice = await ziContract.purchasePrice();    
+            //
             
+            const amTokenAddress                    = await auctionModuleContract.tokenAddress();
+            const amTotalAuctionAmount              = await auctionModuleContract.totalAuctionAmount();
+            const amTotalAmountSold                 = await auctionModuleContract.totalAmountSold();
+            const amLimit                           = await auctionModuleContract.limit();
+            const amInitialAuctionPrice             = await auctionModuleContract.initialAuctionPrice();
+            const amLastAvailableAuctionStartTime   = await auctionModuleContract.lastAvailableAuctionStartTime();
+            const amStartTime                       = await auctionModuleContract.startTime();
+            const amTimeToEmitAll                   = await auctionModuleContract.timeToEmitAll();
+            const amHalflife                        = await auctionModuleContract.halflife();
+            const amDecayConstant                   = await auctionModuleContract.decayConstant();
+            const amEmissionRate                    = await auctionModuleContract.emissionRate();
+            const amCriticalTime                    = await auctionModuleContract.criticalTime();
+            const amCriticalAmount                  = await auctionModuleContract.criticalAmount();
+            const amPurchasePrice                   = await auctionModuleContract.purchasePrice(ethers.utils.parseEther("1.0"));
 
-            setInitialSupply(zi_data[0].result);
-            setSupplyLimit(zi_data[1].result);
-            setMinterAddresses(zi_data[2].result);
-            setMinters(zi_data[3].result);
-            setMinterAllowance(zi_data[4].result);
-            setInitialAllowance(zi_data[5].result);
-            setEnabledMinters(zi_data[6].result);
-            setIsMinter(zi_data[7].result);
-            setRemainingSupply(zi_data[8].result);
-            setOneBipOfTotalSupply(zi_data[9].result);
-            setAllMinters(zi_data[10].result);
-            setTotalSupply(zi_data[11].result);
+            setInitialSupply(ziInitialSupply)
+            setSupplyLimit(ziSupplyLimit)
+            // setMinterAddresses(ziMinterAddresses)
+            // setMinters(ziMinters)
+            // setMinterAllowance(ziMinterAllowance)
+            // setInitialAllowance(ziInitialAllowance)
+            // setEnabledMinters(ziEnabledMinters )
+            // setIsMinter(ziIsMinter)
+            setRemainingSupply(ziRemainingSupply)
+            setOneBipOfTotalSupply(ziOneBipOfTotalSupply)
+            setAllMinters(ziAllMinters )
+            setTotalSupply(ziTotalSupply)
             
             
-            setToken(auctionModule_data[0].result);
-            setTokenAddress(auctionModule_data[1].result);
-            setTotalAuctionAmount(auctionModule_data[2].result);
-            setTotalAmountSold(auctionModule_data[3].result);
-            setLimit(auctionModule_data[4].result);
-            setInitialAuctionPrice(auctionModule_data[5].result);
-            setLastAvailableAuctionStartTime(auctionModule_data[6].result);
-            setStartTime(auctionModule_data[7].result);
-            setTimeToEmitAll(auctionModule_data[8].result);
-            setHalflife(auctionModule_data[9].result);
-            setDecayConstant(auctionModule_data[10].result);
-            setEmissionRate(auctionModule_data[11].result);
-            setCriticalTime(auctionModule_data[12].result);
-            setCriticalAmount(auctionModule_data[13].result);
-            setPurchasePriceForOne(auctionModule_data[14].result);
-
+            setTokenAddress(amTokenAddress)
+            setTotalAuctionAmount(amTotalAuctionAmount)
+            setTotalAmountSold(amTotalAmountSold)
+            setLimit(amLimit)
+            setInitialAuctionPrice(amInitialAuctionPrice)
+            setLastAvailableAuctionStartTime(amLastAvailableAuctionStartTime)
+            setStartTime(amStartTime)
+            setTimeToEmitAll(amTimeToEmitAll)
+            setHalflife(amHalflife)
+            setDecayConstant(amDecayConstant)
+            setEmissionRate(amEmissionRate)
+            setCriticalTime(amCriticalTime)
+            setCriticalAmount(amCriticalAmount)
+            setPurchasePriceForOne(amPurchasePrice)
         };
 
         fetchData();
-    }, []);
 
-    const { data: blockNumberData, isError: blockNumberIsError, isLoading: blockNumberIsLoading } = useBlockNumber({ watch: true });
-    const { address } = useAccount();
+            
+    }, [signer]);
 
+    const [accountAddress, setAccountAddress] = useState<any>()
+
+    useEffect(() => {
+        const fetchAccountData = async () => {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            setAccountAddress(accounts[0]);
+        }
+        
+        fetchAccountData();
+    }, [])
+
+    
     return (
-        <ContractContext.Provider value={{ 
-            blockNumberData, 
-            address, 
+        <ContractContext.Provider value={{
+             
+            accountAddress, 
             initialSupply, 
             supplyLimit, 
-            minterAddresses, 
-            minters, 
-            minterAllowance, 
-            initialAllowance, 
-            enabledMinters, 
-            isMinter, 
+            
+            
+            
             remainingSupply, 
             oneBipOfTotalSupply, 
             allMinters,
             totalSupply, 
             purchasePriceForOne,
             contractConfig,
-            
-            
+                        accountAddress,
         }}>
             {children}
         </ContractContext.Provider>
     );
 }
 export { ContractContext, ContractProvider }
-// const ContractProvider = ({ children }: any) => {
-    
-//     const [totalSupply, setTotalSupply] = useState(null);
-//     const [emissionRate, setEmissionRate] = useState(null);
-//     const [purchasePrice, setPurchasePrice] = useState(null);
 
-    
-//     const zi_address = contractConfig.Zi.contractAddress;
-//     const zi_abi = contractConfig.Zi.contractABI;
-//     const auctionModule_address = contractConfig.AuctionModule.contractAddress;
-//     const auctionModule_abi = contractConfig.AuctionModule.contractABI;
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-        
-//             const totalSupply = await readContract({
-//                             address: zi_address,
-//                             abi: zi_abi,
-//                             functionName: 'totalSupply',
-//                             args: []
-//                         })
-            
-//                         const emissionRate = await readContract({
-//                             address: auctionModule_address,
-//                                 abi: auctionModule_abi,
-//                                 functionName: 'emissionRate',
-//                                 args:[]
-//                         })
-//                         const purchasePrice = await readContract({
-//                             address: auctionModule_address,
-//                                 abi: auctionModule_abi,
-//                                 functionName: 'purchasePrice',
-//                                 args:[1000000000000000000]
-//                         })
-        
-//             setTotalSupply(totalSupply);
-//             setEmissionRate(emissionRate);
-//             setPurchasePrice(purchasePrice);
-//         };
-
-//         fetchData();
-//     }, [].result);
-//     const { data: blockNumberData, isError: blockNumberIsError, isLoading: blockNumberIsLoading } = useBlockNumber({
-//         watch: true
-//     })
-//     const { address } = useAccount();
-//     return(
-//         <ContractContext.Provider value={{blockNumberData, address, contractConfig, totalSupply, 
-//             emissionRate,
-//             purchasePrice
-//             }}>
-//             {children}
-//         </ContractContext.Provider>
-//     )
-// }
-// export { ContractContext, ContractProvider }
-
-
-// Publicly Callable View Functions:
-
-// function initialSupply() public view returns (uint256);
-// function supplyLimit() public view returns (uint256);
-// function minterAddresses(uint) public view returns (address);
-// function minters(address) public view returns (bool);
-// function minterAllowance(address) public view returns (uint256);
-// function initialAllowance(address) public view returns (uint256);
-// function enabledMinters(address) public view returns (bool);
-// function isMinter(address minter) public view returns (bool);
-// function remainingSupply() public view returns (uint256);
-// function oneBipOfTotalSupply() public view returns (uint256);
-// function allMinters() public view returns (address[] memory);
-
-
-// Publicly Callable Write Functions (excluding internal functions):
-
-// constructor(uint256 _initialSupply, uint256 _supplyLimit);
-// function mint(address account, uint256 amount) public nonReentrant onlyOwner;
-// function burn(address account, uint256 amount) public nonReentrant onlyOwner;
-// function mintByMinter(address to, uint256 amount) public nonReentrant whenNotDisabled(msg.sender) onlyMinters;
-// function burnByMinter(address from, uint256 amount) public nonReentrant whenNotDisabled(msg.sender) onlyMinters;
-// function configureMinter(address minter, uint256 allowance) external onlyOwner returns (bool);
-// function removeMinter(address minter) external onlyOwner returns (bool);
-
-
-// The publically callable view functions in this contract are:
-
-// `token()`: Returns the token that's being auctioned.
-// `tokenAddress()`: Returns the address of the token that's being auctioned.
-// `totalAuctionAmount()`: Returns the total amount of the token that's being auctioned.
-// `totalAmountSold()`: Returns the total amount of the token that has been sold.
-// `limit()`: Returns the limit of the auction.
-// `initialAuctionPrice()`: Returns the initial price of the auction.
-// `lastAvailableAuctionStartTime()`: Returns the last available start time of the auction.
-// `startTime()`: Returns the start time of the auction.
-// `timeToEmitAll()`: Returns the time to emit all the tokens.
-//  `halflife()`: Returns the halflife of the auction.
-//  `decayConstant()`: Returns the decay constant of the auction.
-//  `emissionRate()`: Returns the emission rate of the auction.
-//  `criticalTime()`: Returns the critical time of the auction.
-//  `criticalAmount()`: Returns the critical amount of the auction.
-//  `purchasePrice(uint256 numTokens)`: Returns the purchase price for a specific number of tokens.
- 
-// The publically callable write functions in this contract are:
-// `constructor(address _tokenAddress, uint256 _totalAuctionAmount, uint256 _initialAuctionPrice, uint256 _timeToEmitAll)`: Sets the initial parameters for the auction.
-// `depositInitialReserves()`: Transfers the auction tokens from the owner to the contract.
-// `withdrawReserves(uint256 amount)`: Allows the owner to withdraw a specified amount of the auction tokens.
-// `purchaseTokens(uint256 numTokens, address to)`: Allows a user to purchase a specified number of tokens.
-// `depositMoreForAuctioning(uint256 additionalAuctionAmount, uint256 extraTime)`: Allows the owner to deposit more tokens for the auction and extend the time of the auction.
-// `rescueERC20(address tokenContract, address to, uint256 amount)`: Allows the owner to rescue any ERC20 token accidentally sent to the contract.

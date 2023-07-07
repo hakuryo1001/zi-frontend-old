@@ -25,7 +25,7 @@ import { createContext } from 'react';
 import type { AppProps } from 'next/app';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { createConfig, configureChains, WagmiConfig } from 'wagmi';
+import { createConfig, configureChains, WagmiConfig, mainnet, sepolia } from 'wagmi';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
@@ -39,23 +39,27 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 import { goerli } from '@wagmi/core/chains';
 
-// const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
 
 
-// const supportedChains = ["canto"];
+const ALCHEMY_GOERLI_API_KEY  = process.env.ALCHEMY_GOERLI_API_KEY
+const ALCHEMY_SEPOLIA_API_KEY = process.env.ALCHEMY_SEPOLIA_API_KEY
+const ALCHEMY_MAINNET_API_KEY = process.env.ALCHEMY_MAINNET_API_KEY
+
+const ALCHEMY_GOERLI_RPCURL = process.env.ALCHEMY_GOERLI_RPCURL
+const ALCHEMY_SEPOLIA_RPCURL = process.env.ALCHEMY_SEPOLIA_RPCURL
+const ALCHEMY_MAINNET_RPCURL = process.env.ALCHEMY_MAINNET_RPCURL
+
 
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { localhost } from 'wagmi/chains'
 
 
 
-const INFURA_KEY = ''
+
 
 const injected = injectedModule()
 const coinbase = coinbaseModule()
 const dcent = dcentModule()
-// const walletConnect = walletConnectModule()
-
 
 const infinityWallet = infinityWalletModule()
 
@@ -76,6 +80,7 @@ const trezor = trezorModule(trezorOptions)
 
 
 const wallets = [
+  injected,
   infinityWallet,
   keepkey,
   sequence,
@@ -96,27 +101,22 @@ const chains = [
   //   id: '0x1',
   //   token: 'ETH',
   //   label: 'Ethereum Mainnet',
-  //   rpcUrl: `https://mainnet.infura.io/v3/${INFURA_KEY}`
+  //   rpcUrl: ALCHEMY_MAINNET_RPCURL
   // },
   // {
   //   id: '0x5',
   //   token: 'ETH',
   //   label: 'Goerli',
-  //   rpcUrl: `https://goerli.infura.io/v3/${INFURA_KEY}`
+  //   rpcUrl: ALCHEMY_GOERLI_API_KEY
   // },
   
-  // {
-  //   id: '0xA',
-  //   token: 'OETH',
-  //   label: 'Optimism',
-  //   rpcUrl: 'https://mainnet.optimism.io'
-  // },
-  // {
-  //   id: '0xA4B1',
-  //   token: 'ARB-ETH',
-  //   label: 'Arbitrum',
-  //   rpcUrl: 'https://rpc.ankr.com/arbitrum'
-  // },
+  {
+    id: '0xaa36a7',
+    token: 'ETH',
+    label: 'Sepolia',
+    rpcUrl: ALCHEMY_SEPOLIA_RPCURL
+  },
+  
   {
     id: '1337',
     token: 'localETH',
@@ -126,9 +126,9 @@ const chains = [
 ]
 
 const appMetadata = {
-  name: 'Connect Wallet Example',
+  name: 'zi-launchpad',
   icon: '<svg>My App Icon</svg>',
-  description: 'Example showcasing how to connect a wallet.',
+  description: 'auctionModule for the Zi token',
   recommendedInjectedWallets: [
     { name: 'MetaMask', url: 'https://metamask.io' },
     { name: 'Coinbase', url: 'https://wallet.coinbase.com/' }
@@ -143,16 +143,16 @@ const web3Onboard = init({
 
 
 
-
-
 const { chains: wagmiChains, publicClient, webSocketPublicClient } = configureChains(
-  [localhost],
+  [localhost, mainnet, sepolia, goerli],
   [
-    // alchemyProvider({ apiKey: 'yourAlchemyApiKey' }),
+    alchemyProvider({ apiKey: ALCHEMY_SEPOLIA_API_KEY }),
+    alchemyProvider({ apiKey: ALCHEMY_GOERLI_API_KEY }),
+    alchemyProvider({ apiKey: ALCHEMY_MAINNET_API_KEY }),
     publicProvider()],
 )
 
-export const injectedConnector = new InjectedConnector({
+ const injectedConnector = new InjectedConnector({
   chains: wagmiChains,
 })
 
@@ -160,22 +160,7 @@ export const injectedConnector = new InjectedConnector({
 const config = createConfig({
   autoConnect: true,
   connectors: [
-    injectedConnector,
-    // new MetaMaskConnector({ chains: wagmiChains }),
-    // new CoinbaseWalletConnector({
-    //   chains: wagmiChains,
-    //   options: {
-    //     appName: 'wagmi',
-    //   },
-    // }),
-    // new WalletConnectConnector({
-    //   chains: wagmiChains,
-    //   options: {
-    //     projectId: '...',
-    //   },
-    // }),
-    
-  ],
+    injectedConnector],
   publicClient,
   webSocketPublicClient,
 })
